@@ -3,6 +3,7 @@ const express = require("express");
 const authRouter = require("./routes/auth_route")
 
 const app = express();
+app.use(express.json())
 
 app.get("/", (req, res) => {
     res.status(200).json({
