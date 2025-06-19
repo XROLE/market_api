@@ -77,7 +77,8 @@ const authentication = catchAsync( async (req, res, next) => {
 
     const tokenDetails = jwt.verify(idToken, process.env.JWT_SECRETE_KET);
 
-    const freshUser = await user.findByPk(tokenDetails.id);
+
+    const freshUser = await user.findByPk(tokenDetails.id["id"]);
 
     if(!freshUser){
         return next(new AppError("User no longer exist"));
@@ -89,4 +90,15 @@ const authentication = catchAsync( async (req, res, next) => {
 
 });
 
-module.exports = { signUp, login, authentication };
+const restrictTo = (...userType) => {
+    const checkPermission = (req, res, next) => {
+        if(!userType.includes(req.user.userType)){
+            return next(new AppError("You don't have permission to perform this action", 403));
+        }
+
+        return next();
+    }
+    return checkPermission;
+}
+
+module.exports = { signUp, login, authentication, restrictTo };
